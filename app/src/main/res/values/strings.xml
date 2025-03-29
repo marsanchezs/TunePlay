@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TunePlay</string>
+    <string name="loading">Cargando</string>
 </resources>
