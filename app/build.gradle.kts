@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.hilt)
+    kotlin("kapt")
 }
 
 android {
@@ -39,6 +42,12 @@ android {
     }
 }
 
+detekt {
+    toolVersion = libs.versions.detekt.get()
+    config = files("$rootDir/detekt-config.yml")
+    buildUponDefaultConfig = true
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -49,6 +58,19 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    implementation(libs.coil)
+    implementation(libs.exo.common)
+    implementation(libs.exo.player)
+    implementation(libs.exo.session)
+    implementation(libs.exo.ui)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    kapt(libs.hilt.compiler)
+    implementation(libs.lottie.compose)
+    implementation(libs.navigation.compose)
+    implementation(libs.androidx.splash.screen)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
