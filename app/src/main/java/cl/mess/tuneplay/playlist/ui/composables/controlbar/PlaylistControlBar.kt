@@ -1,5 +1,8 @@
 package cl.mess.tuneplay.playlist.ui.composables.controlbar
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import cl.mess.tuneplay.playlist.domain.model.Song
 import cl.mess.tuneplay.ui.theme.controlBarColor
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PlaylistControlBar(attrs: AttrsPlaylistControlBar) {
     Card(
@@ -37,7 +41,9 @@ fun PlaylistControlBar(attrs: AttrsPlaylistControlBar) {
         ) {
             PlaylistControlBarTitle(
                 onClick = attrs.onClick,
-                song = attrs.song
+                song = attrs.song,
+                animatedVisibilityScope = attrs.animatedVisibilityScope,
+                sharedTransitionScope = attrs.sharedTransitionScope
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -51,9 +57,11 @@ fun PlaylistControlBar(attrs: AttrsPlaylistControlBar) {
     }
 }
 
-data class AttrsPlaylistControlBar(
+data class AttrsPlaylistControlBar @OptIn(ExperimentalSharedTransitionApi::class) constructor(
     val song: Song,
     val onClick: () -> Unit,
     val attrsSlider: AttrsSlider,
-    val attrsButtons: AttrsButtons
+    val attrsButtons: AttrsButtons,
+    val sharedTransitionScope: SharedTransitionScope,
+    val animatedVisibilityScope: AnimatedVisibilityScope
 )
