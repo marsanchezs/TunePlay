@@ -1,5 +1,8 @@
 package cl.mess.tuneplay.playlist.ui.composables
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import cl.mess.tuneplay.playlist.domain.model.Song
 import cl.mess.tuneplay.playlist.presentation.PlaylistViewModel
@@ -9,6 +12,7 @@ import cl.mess.tuneplay.playlist.ui.composables.controlbar.AttrsSlider
 import cl.mess.tuneplay.playlist.ui.composables.controlbar.ButtonActions
 import cl.mess.tuneplay.playlist.ui.composables.controlbar.PlaylistControlBar
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PlaylistBottomBar(attrs: AttrsPlaylistBottomBar) {
     val duration = attrs.song.duration.coerceAtLeast(1L)
@@ -21,6 +25,8 @@ fun PlaylistBottomBar(attrs: AttrsPlaylistBottomBar) {
         attrs = AttrsPlaylistControlBar(
             song = attrs.song,
             onClick = attrs.onShowDialog,
+            animatedVisibilityScope = attrs.animatedVisibilityScope,
+            sharedTransitionScope = attrs.sharedTransitionScope,
             attrsSlider = AttrsSlider(progress, onValueChange),
             attrsButtons = AttrsButtons(
                 isPlaying = attrs.isPlaying,
@@ -37,11 +43,13 @@ fun PlaylistBottomBar(attrs: AttrsPlaylistBottomBar) {
     )
 }
 
-data class AttrsPlaylistBottomBar(
+data class AttrsPlaylistBottomBar @OptIn(ExperimentalSharedTransitionApi::class) constructor(
     val song: Song,
     val currentPosition: Long,
     val isPlaying: Boolean,
     val isShuffleEnabled: Boolean,
     val viewModel: PlaylistViewModel,
-    val onShowDialog: () -> Unit
+    val onShowDialog: () -> Unit,
+    val sharedTransitionScope: SharedTransitionScope,
+    val animatedVisibilityScope: AnimatedVisibilityScope
 )

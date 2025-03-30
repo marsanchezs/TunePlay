@@ -1,5 +1,8 @@
 package cl.mess.tuneplay.playlist.ui.composables
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import cl.mess.tuneplay.playlist.domain.model.Song
 import cl.mess.tuneplay.playlist.presentation.PlaylistViewModel
@@ -11,6 +14,7 @@ import cl.mess.tuneplay.playlist.ui.composables.playlistsong.AttrsPlaylistSongTo
 import cl.mess.tuneplay.playlist.ui.composables.playlistsong.PlaylistSong
 import cl.mess.tuneplay.playlist.ui.composables.playlistsong.slider.AttrsPlaylistSongSlider
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PlaylistSongDialog(attrs: AttrsPlaylistSongDialog) {
     val progress = attrs.currentPosition.toFloat() / attrs.song.duration.toFloat()
@@ -24,7 +28,9 @@ fun PlaylistSongDialog(attrs: AttrsPlaylistSongDialog) {
                 title = attrs.song.title,
                 artist = attrs.song.artist,
                 imageUrl = attrs.song.albumArt,
-                onDismiss = attrs.onDismiss
+                onDismiss = attrs.onDismiss,
+                animatedVisibilityScope = attrs.animatedVisibilityScope,
+                sharedTransitionScope = attrs.sharedTransitionScope
             ),
             attrsContent = AttrsPlaylistSongContent(
                 song = attrs.song,
@@ -51,11 +57,13 @@ fun PlaylistSongDialog(attrs: AttrsPlaylistSongDialog) {
     )
 }
 
-data class AttrsPlaylistSongDialog(
+data class AttrsPlaylistSongDialog @OptIn(ExperimentalSharedTransitionApi::class) constructor(
     val song: Song,
     val isPlaying: Boolean,
     val isShuffleEnabled: Boolean,
     val currentPosition: Long,
     val onDismiss: () -> Unit,
-    val viewModel: PlaylistViewModel
+    val viewModel: PlaylistViewModel,
+    val sharedTransitionScope: SharedTransitionScope,
+    val animatedVisibilityScope: AnimatedVisibilityScope
 )
