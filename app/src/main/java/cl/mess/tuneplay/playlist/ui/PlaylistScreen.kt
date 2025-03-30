@@ -1,5 +1,8 @@
 package cl.mess.tuneplay.playlist.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cl.mess.tuneplay.playlist.domain.model.Song
 import cl.mess.tuneplay.playlist.presentation.PlaylistViewModel
+import cl.mess.tuneplay.playlist.ui.SharedTransitionConstants.BASIC_TRANSITION_LABEL
 import cl.mess.tuneplay.playlist.ui.composables.AttrsPlaylistBottomBar
 import cl.mess.tuneplay.playlist.ui.composables.AttrsPlaylistContent
 import cl.mess.tuneplay.playlist.ui.composables.AttrsPlaylistSongDialog
@@ -27,6 +31,7 @@ import cl.mess.tuneplay.playlist.ui.composables.PlaylistContent
 import cl.mess.tuneplay.playlist.ui.composables.PlaylistSongDialog
 import cl.mess.tuneplay.ui.theme.backgroundColor
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PlaylistScreen(viewModel: PlaylistViewModel = hiltViewModel()) {
     val songs by viewModel.songs.collectAsState()
@@ -44,48 +49,47 @@ fun PlaylistScreen(viewModel: PlaylistViewModel = hiltViewModel()) {
         if (currentIndex != -1) listState.scrollToItem(currentIndex)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = backgroundColor)
-    ) {
-        PlaylistContent(
-            attrs = AttrsPlaylistContent(
-                songs = songs,
-                isLoading = isLoading,
-                currentSong = currentSong,
-                listState = listState,
-                onSongClick = viewModel::playSong,
-                modifier = Modifier
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                    .weight(weight = 1f)
-            )
-        )
-        Spacer(modifier = Modifier.height(height = 8.dp))
-        currentSong?.let { song ->
-            PlaylistBottomBar(
-                attrs = AttrsPlaylistBottomBar(
-                    song = song,
-                    currentPosition = currentPosition,
-                    isPlaying = isPlaying,
-                    isShuffleEnabled = isShuffleEnabled,
-                    viewModel = viewModel,
-                    onShowDialog = {
-                        selectedSong = song
-                        isDialogVisible = true
+    SharedTransitionLayout {
+        AnimatedContent(
+            targetState = isDialogVisible,
+            label = BASIC_TRANSITION_LABEL
+        ) { targetState ->
+            if (!targetState) {
+                Column(
+                    modifier = Modifier.fillMaxSize().background(color = backgroundColor)
+                ) {
+                    PlaylistContent(
+                        attrs = AttrsPlaylistContent(songs = songs, isLoading = isLoading,
+                            currentSong = currentSong, listState = listState,
+                            onSongClick = viewModel::playSong, modifier = Modifier
+                                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                                .weight(weight = 1f))
+                    )
+                    Spacer(modifier = Modifier.height(height = 8.dp))
+                    currentSong?.let { song ->
+                        PlaylistBottomBar(
+                            attrs = AttrsPlaylistBottomBar(song = song,
+                                currentPosition = currentPosition, isPlaying = isPlaying,
+                                isShuffleEnabled = isShuffleEnabled, viewModel = viewModel,
+                                onShowDialog = {
+                                    selectedSong = song
+                                    isDialogVisible = true
+                                }, animatedVisibilityScope = this@AnimatedContent,
+                                sharedTransitionScope = this@SharedTransitionLayout)
+                        )
                     }
-                )
-            )
-        }
-    }
-
-    if (isDialogVisible && currentSong != null) {
-        currentSong?.let { song ->
-            PlaylistSongDialog(
-                attrs = AttrsPlaylistSongDialog(song = song, isPlaying = isPlaying,
-                    isShuffleEnabled = isShuffleEnabled, currentPosition = currentPosition,
-                    onDismiss = { isDialogVisible = false }, viewModel = viewModel)
-            )
+                }
+            } else {
+                currentSong?.let { song ->
+                    PlaylistSongDialog(
+                        attrs = AttrsPlaylistSongDialog(song = song, isPlaying = isPlaying,
+                            isShuffleEnabled = isShuffleEnabled, currentPosition = currentPosition,
+                            onDismiss = { isDialogVisible = false }, viewModel = viewModel,
+                            animatedVisibilityScope = this@AnimatedContent,
+                            sharedTransitionScope = this@SharedTransitionLayout)
+                    )
+                }
+            }
         }
     }
 }
